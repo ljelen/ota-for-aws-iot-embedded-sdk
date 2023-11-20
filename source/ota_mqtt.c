@@ -603,6 +603,11 @@ static OtaMqttStatus_t publishStatusMessage( const OtaAgentContext_t * pAgentCtx
     return mqttStatus;
 }
 
+__attribute ((weak)) void ota_report_progress(uint32_t received, uint32_t numBlocks)
+{
+    printf("__OTA progress: %d/%d\n", received, numBlocks);
+}
+
 static uint32_t buildStatusMessageReceiving( char * pMsgBuffer,
                                              size_t msgBufferSize,
                                              OtaJobStatus_t status,
@@ -635,6 +640,8 @@ static uint32_t buildStatusMessageReceiving( char * pMsgBuffer,
 
     numBlocks = ( pOTAFileCtx->fileSize + ( OTA_FILE_BLOCK_SIZE - 1U ) ) >> otaconfigLOG2_FILE_BLOCK_SIZE;
     received = numBlocks - pOTAFileCtx->blocksRemaining;
+
+    ota_report_progress(received, numBlocks);
 
     /* Output a status update when receiving first file block to let user know the OTA job status
      * more clearly. Then output a status update once in a while. */
